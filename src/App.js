@@ -1,5 +1,11 @@
 import React from "react";
-import emptyStateImage from "./bg img.png";
+import Header from "./components/Header.js";
+import CreateNote from "./components/CreateNote.js";
+import CreateNoteForm from "./components/CreateNoteForm.js";
+import NoteList from "./components/NoteList.js";
+import EmptyNote from "./components/EmptyNote";
+import Footer from "./components/Footer.js";
+
 import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 
@@ -64,155 +70,4 @@ export default function App() {
     </div>
   );
 }
-
-function Header() {
-  return (
-    <div className="Header">
-      <h2>My Notebook 📒</h2>
-    </div>
-  );
-}
-
-function CreateNote({ handleCreateNote }) {
-  return (
-    <div className="create-note">
-      <h4 onClick={() => handleCreateNote()}>
-        <i className="fas fa-plus-circle"></i> Create a new note
-      </h4>
-    </div>
-  );
-}
-
-function CreateNoteForm({ handleFormdata, selectedNote, handleCloseForm }) {
-  const [item, setItem] = useState(selectedNote || {});
-
-  function handleChange(e) {
-    const name = e.target.name;
-    const value = e.target.value;
-
-    setItem((values) => ({ ...values, [name]: value }));
-  }
-
-  return (
-    <div className="create-note-modal">
-      <form
-        className="modal"
-        onSubmit={(e) => {
-          e.preventDefault();
-          handleFormdata({ ...item, id: uuidv4() });
-        }}
-      >
-        <label>Title:</label>
-        <input
-          type="text"
-          name="title"
-          value={item.title || ""}
-          onChange={handleChange}
-          required
-        />
-        <label>Content</label>
-        <textarea
-          rows="5"
-          cols="33"
-          name="content"
-          value={item.content || ""}
-          onChange={handleChange}
-          required
-        ></textarea>
-        <label>Category</label>
-        <select
-          id="category"
-          name="category"
-          value={item.category || ""}
-          onChange={handleChange}
-          required
-        >
-          <option value="">Select...</option>
-          <option value="Education">Education</option>
-          <option value="Sports">Sports</option>
-          <option value="Meeting">Meeting</option>
-          <option value="Health">Health</option>
-        </select>
-        <div className="button-group">
-          <button type="submit">Submit</button>
-          <button
-            type="button"
-            className="close-button"
-            onClick={handleCloseForm}
-          >
-            Close
-          </button>
-        </div>
-      </form>
-    </div>
-  );
-}
-
-function NoteList({ formdataArray, handleDelete, handleEdit }) {
-  return (
-    <div className="note-list">
-      {formdataArray.map((item) => (
-        <NoteItem
-          key={item.id}
-          id={item.id}
-          title={item.title}
-          content={item.content}
-          category={item.category}
-          handleDelete={handleDelete}
-          handleEdit={handleEdit}
-        />
-      ))}
-    </div>
-  );
-}
-
-function NoteItem({ id, title, content, category, handleDelete, handleEdit }) {
-  const handleEditClick = () => {
-    handleEdit({ id, title, content, category });
-  };
-
-  return (
-    <div className="note-item">
-      <div className="note-item-info">
-        <h4>
-          {title} <span className="category">{category}</span>
-        </h4>
-        <p>{content}</p>
-      </div>
-      <div className="note-item-actions">
-        <div>
-          <button onClick={handleEditClick}>
-            <i className="fas fa-pencil-alt"></i>
-          </button>
-          <button onClick={() => handleDelete(id)}>
-            <i className="fas fa-trash"></i>
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function EmptyNote() {
-  return (
-    <div className="empty-state">
-      <p>
-        No notes added yet. Start creating notes to keep track of your thoughts
-        and ideas.
-      </p>
-      <img
-        src={emptyStateImage}
-        alt="img"
-        style={{ width: "300px", height: "auto", backgroundColor: "#f0f0f0;" }}
-      ></img>
-    </div>
-  );
-}
-
-function Footer() {
-  return (
-    <footer style={{ textAlign: "center", padding: "20px" }}>
-      Crafted with ❤️ by Tufail Dar
-    </footer>
-  );
-}
+/*-------------------------------------------------------*/

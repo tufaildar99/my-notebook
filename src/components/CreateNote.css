@@ -1,0 +1,13 @@
+.create-note {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px;
+  color: #37bff0;
+  border: none;
+  border-radius: 1px;
+  cursor: pointer;
+  font-size: 23px; /* Increase the font size */
+  font-family: Arial, sans-serif; /* Change the font family */
+  text-decoration: underline;
+}
