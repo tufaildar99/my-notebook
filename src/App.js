@@ -21,6 +21,7 @@ export default function App() {
       );
       setFormdataArray(updatedFormdataArray);
       setSelectedNote(null);
+    } else {
       // Creating a new note
       setFormdataArray([...formdataArray, { ...formdata, id: uuidv4() }]);
     }
