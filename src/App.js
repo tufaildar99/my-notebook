@@ -37,6 +37,10 @@ export default function App() {
     setShowForm(true);
   }
 
+  function handleCloseForm() {
+    setShowForm(false);
+    setSelectedNote(null);
+  }
   return (
     <div className="app">
       <Header />
@@ -45,6 +49,7 @@ export default function App() {
         <CreateNoteForm
           handleFormdata={handleFormdata}
           selectedNote={selectedNote}
+          handleCloseForm={handleCloseForm}
         />
       ) : formdataArray.length > 0 ? (
         <NoteList
@@ -78,7 +83,7 @@ function CreateNote({ handleCreateNote }) {
   );
 }
 
-function CreateNoteForm({ handleFormdata, selectedNote }) {
+function CreateNoteForm({ handleFormdata, selectedNote, handleCloseForm }) {
   const [item, setItem] = useState(selectedNote || {});
 
   function handleChange(e) {
@@ -103,6 +108,7 @@ function CreateNoteForm({ handleFormdata, selectedNote }) {
           name="title"
           value={item.title || ""}
           onChange={handleChange}
+          required
         />
         <label>Content</label>
         <textarea
@@ -111,6 +117,7 @@ function CreateNoteForm({ handleFormdata, selectedNote }) {
           name="content"
           value={item.content || ""}
           onChange={handleChange}
+          required
         ></textarea>
         <label>Category</label>
         <select
@@ -118,6 +125,7 @@ function CreateNoteForm({ handleFormdata, selectedNote }) {
           name="category"
           value={item.category || ""}
           onChange={handleChange}
+          required
         >
           <option value="">Select...</option>
           <option value="Education">Education</option>
@@ -127,7 +135,11 @@ function CreateNoteForm({ handleFormdata, selectedNote }) {
         </select>
         <div className="button-group">
           <button type="submit">Submit</button>
-          <button type="button" className="close-button">
+          <button
+            type="button"
+            className="close-button"
+            onClick={handleCloseForm}
+          >
             Close
           </button>
         </div>
