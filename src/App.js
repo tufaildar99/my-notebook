@@ -1,23 +1,31 @@
 import React from "react";
-
-/* <App>
-  ├── <NoteList>
-  │     ├── <NoteItem />
-  │     ├── <NoteItem />
-  │     └── ...
-  ├── <NoteEditor />
-  ├── <DeleteConfirmation />
-  └── <Optional: CategoriesTags />
-       └── <Optional: CategoryTagItem />
-  └── <Optional: SearchBar />
- */
+import emptyStateImage from "./bg img.png";
+import { useState } from "react";
 
 export default function App() {
+  const [showForm, setShowForm] = useState(false);
+  const [formdataArray, setFormdataArray] = useState([]);
+
+  function handleCreateNote() {
+    setShowForm(!showForm);
+  }
+
+  function handleFormdata(formdata) {
+    setFormdataArray([...formdataArray, formdata]);
+    setShowForm(false);
+  }
+
   return (
     <div className="app">
       <Header />
-      <CreateNote />
-
+      <CreateNote handleCreateNote={handleCreateNote} />
+      {showForm ? (
+        <CreateNoteForm handleFormdata={handleFormdata} />
+      ) : formdataArray.length > 0 ? (
+        <NoteList formdataArray={formdataArray} />
+      ) : (
+        <EmptyNote />
+      )}
       <Footer />
     </div>
   );
@@ -31,65 +39,97 @@ function Header() {
   );
 }
 
-function CreateNote() {
+function CreateNote({ handleCreateNote }) {
   return (
     <div className="create-note">
-      <a>
-        <h4>
-          <i className="fas fa-plus-circle"></i> Create a new note
-        </h4>
-      </a>
+      <h4 onClick={() => handleCreateNote()}>
+        <i className="fas fa-plus-circle"></i> Create a new note
+      </h4>
     </div>
   );
 }
 
-function CreateNoteForm() {
+function CreateNoteForm({ handleFormdata }) {
+  const [item, setItem] = useState({});
+
+  function handleChange(e) {
+    const name = e.target.name;
+    const value = e.target.value;
+
+    setItem((values) => ({ ...values, [name]: value }));
+  }
+
   return (
     <div className="create-note-modal">
-      <form className="modal">
+      <form
+        className="modal"
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleFormdata(item);
+        }}
+      >
         <label>Title:</label>
-        <input type="text" name="title" />
+        <input
+          type="text"
+          name="title"
+          value={item.title}
+          onChange={handleChange}
+        />
         <label>Content</label>
-        <textarea rows="5" cols="33"></textarea>
+        <textarea
+          rows="5"
+          cols="33"
+          name="content"
+          value={item.content}
+          onChange={handleChange}
+        ></textarea>
         <label>Category</label>
-        <select id="category" name="category">
+        <select
+          id="category"
+          name="category"
+          value={item.category}
+          onChange={handleChange}
+        >
+          <option value="">Select...</option>
           <option value="education">Education</option>
           <option value="sports">Sports</option>
           <option value="meeting">Meeting</option>
           <option value="health">Health</option>
         </select>
-        <button type="submit">Submit</button>
+        <div className="button-group">
+          <button type="submit">Submit</button>
+          <button type="button" className="close-button">
+            Close
+          </button>
+        </div>
       </form>
     </div>
   );
 }
 
-function NoteList() {
+function NoteList({ formdataArray }) {
   return (
     <div className="note-list">
-      <NoteItem />
-      <NoteItem />
-      <NoteItem />
+      {formdataArray.map((item, index) => (
+        <NoteItem
+          key={index}
+          title={item.title}
+          content={item.content}
+          category={item.category}
+        />
+      ))}
     </div>
   );
 }
 
-function NoteItem() {
+function NoteItem({ title, content, category }) {
   return (
     <div className="note-item">
       <div className="note-item-info">
         <h4>
-          Lorem Ipsum <span className="category">Education</span>
+          {title} <span className="category">{category}</span>
         </h4>
-        <p>
-          I'm sorry, but I'm not able to generate "lorem ipsum" text for you. My
-          expertise is limited to software development topics. Is there anything
-          else I can assist you with? I'm sorry, but I'm note anything else I
-          can assist you with? I'm sorry, but I'm not able to generate "lorem
-          ipsum" text for you. My expertise is limited to software development
-          topics. Is there anything else I can assist you with? I'm sorry, but
-          I'm note anything else I can assist you with?
-        </p>
+        <p>{content}</p>
       </div>
       <div className="note-item-actions">
         <form>
@@ -105,6 +145,26 @@ function NoteItem() {
   );
 }
 
+function EmptyNote() {
+  return (
+    <div className="empty-state">
+      <p>
+        No notes added yet. Start creating notes to keep track of your thoughts
+        and ideas.
+      </p>
+      <img
+        src={emptyStateImage}
+        alt="img"
+        style={{ width: "300px", height: "auto", backgroundColor: "#f0f0f0;" }}
+      ></img>
+    </div>
+  );
+}
+
 function Footer() {
-  return <footer className="footer">Designed with ❤️ by Tufaildar</footer>;
+  return (
+    <footer style={{ textAlign: "center", padding: "20px" }}>
+      Crafted with ❤️ by Tufail Dar
+    </footer>
+  );
 }
