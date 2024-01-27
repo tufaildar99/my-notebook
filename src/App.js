@@ -1,18 +1,39 @@
 import React from "react";
 import emptyStateImage from "./bg img.png";
 import { useState } from "react";
+import { v4 as uuidv4 } from "uuid";
 
 export default function App() {
   const [showForm, setShowForm] = useState(false);
   const [formdataArray, setFormdataArray] = useState([]);
+  const [selectedNote, setSelectedNote] = useState(null);
 
   function handleCreateNote() {
     setShowForm(!showForm);
+    setSelectedNote(null);
   }
 
   function handleFormdata(formdata) {
-    setFormdataArray([...formdataArray, formdata]);
+    if (selectedNote) {
+      // Editing an existing note
+      const updatedFormdataArray = formdataArray.map((note) =>
+        note.id === selectedNote.id ? formdata : note
+      );
+      setFormdataArray(updatedFormdataArray);
+      setSelectedNote(null);
+      // Creating a new note
+      setFormdataArray([...formdataArray, { ...formdata, id: uuidv4() }]);
+    }
     setShowForm(false);
+  }
+
+  function handleDelete(id) {
+    const newFormdataArray = formdataArray.filter((item) => item.id !== id);
+    setFormdataArray(newFormdataArray);
+  }
+  function handleEdit(note) {
+    setSelectedNote(note);
+    setShowForm(true);
   }
 
   return (
@@ -20,9 +41,16 @@ export default function App() {
       <Header />
       <CreateNote handleCreateNote={handleCreateNote} />
       {showForm ? (
-        <CreateNoteForm handleFormdata={handleFormdata} />
+        <CreateNoteForm
+          handleFormdata={handleFormdata}
+          selectedNote={selectedNote}
+        />
       ) : formdataArray.length > 0 ? (
-        <NoteList formdataArray={formdataArray} />
+        <NoteList
+          formdataArray={formdataArray}
+          handleDelete={handleDelete}
+          handleEdit={handleEdit}
+        />
       ) : (
         <EmptyNote />
       )}
@@ -49,8 +77,8 @@ function CreateNote({ handleCreateNote }) {
   );
 }
 
-function CreateNoteForm({ handleFormdata }) {
-  const [item, setItem] = useState({});
+function CreateNoteForm({ handleFormdata, selectedNote }) {
+  const [item, setItem] = useState(selectedNote || {});
 
   function handleChange(e) {
     const name = e.target.name;
@@ -65,14 +93,14 @@ function CreateNoteForm({ handleFormdata }) {
         className="modal"
         onSubmit={(e) => {
           e.preventDefault();
-          handleFormdata(item);
+          handleFormdata({ ...item, id: uuidv4() });
         }}
       >
         <label>Title:</label>
         <input
           type="text"
           name="title"
-          value={item.title}
+          value={item.title || ""}
           onChange={handleChange}
         />
         <label>Content</label>
@@ -80,21 +108,21 @@ function CreateNoteForm({ handleFormdata }) {
           rows="5"
           cols="33"
           name="content"
-          value={item.content}
+          value={item.content || ""}
           onChange={handleChange}
         ></textarea>
         <label>Category</label>
         <select
           id="category"
           name="category"
-          value={item.category}
+          value={item.category || ""}
           onChange={handleChange}
         >
           <option value="">Select...</option>
-          <option value="education">Education</option>
-          <option value="sports">Sports</option>
-          <option value="meeting">Meeting</option>
-          <option value="health">Health</option>
+          <option value="Education">Education</option>
+          <option value="Sports">Sports</option>
+          <option value="Meeting">Meeting</option>
+          <option value="Health">Health</option>
         </select>
         <div className="button-group">
           <button type="submit">Submit</button>
@@ -107,22 +135,29 @@ function CreateNoteForm({ handleFormdata }) {
   );
 }
 
-function NoteList({ formdataArray }) {
+function NoteList({ formdataArray, handleDelete, handleEdit }) {
   return (
     <div className="note-list">
-      {formdataArray.map((item, index) => (
+      {formdataArray.map((item) => (
         <NoteItem
-          key={index}
+          key={item.id}
+          id={item.id}
           title={item.title}
           content={item.content}
           category={item.category}
+          handleDelete={handleDelete}
+          handleEdit={handleEdit}
         />
       ))}
     </div>
   );
 }
 
-function NoteItem({ title, content, category }) {
+function NoteItem({ id, title, content, category, handleDelete, handleEdit }) {
+  const handleEditClick = () => {
+    handleEdit({ id, title, content, category });
+  };
+
   return (
     <div className="note-item">
       <div className="note-item-info">
@@ -132,14 +167,14 @@ function NoteItem({ title, content, category }) {
         <p>{content}</p>
       </div>
       <div className="note-item-actions">
-        <form>
-          <button>
-            <i class="fas fa-pencil-alt"></i>
+        <div>
+          <button onClick={handleEditClick}>
+            <i className="fas fa-pencil-alt"></i>
           </button>
-          <button>
-            <i class="fas fa-trash"></i>
+          <button onClick={() => handleDelete(id)}>
+            <i className="fas fa-trash"></i>
           </button>
-        </form>
+        </div>
       </div>
     </div>
   );
